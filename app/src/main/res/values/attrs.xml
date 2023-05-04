@@ -2,5 +2,8 @@
 <resources>
     <declare-styleable name="LoadingButton">
 <!--   TODO: create custom attributes for the view-->
+        <attr name="buttonText" format = "string"/>
+        <attr name="backColor" format = "color"/>
+        <attr name="circleColor" format = "color"/>
     </declare-styleable>
 </resources>

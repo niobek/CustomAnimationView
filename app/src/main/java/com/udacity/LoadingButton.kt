@@ -6,6 +6,7 @@ import android.graphics.*
 import android.util.AttributeSet
 import android.view.View
 import android.view.accessibility.AccessibilityNodeInfo
+import androidx.core.content.withStyledAttributes
 import androidx.core.view.AccessibilityDelegateCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
@@ -61,7 +62,6 @@ class LoadingButton @JvmOverloads constructor(
     }
 
     private var radius = 0.0f
-    private var circleColor = 0
     private var animatedRecWidth = 0
     private var animatedSweepAngle = 0F
 
@@ -71,9 +71,16 @@ class LoadingButton @JvmOverloads constructor(
     private var bottomArcRec  = 0F
     private var arcRectF: RectF? = null
 
+    private var buttonText =  resources.getString(R.string.download)
+    private var backColor = resources.getColor(R.color.colorPrimary)
+    private var circleColor = resources.getColor(R.color.circleColor)
     init {
         isClickable = true
-        circleColor = resources.getColor(R.color.circleColor)
+        context.withStyledAttributes(attrs, R.styleable.LoadingButton) {
+            buttonText = getString(R.styleable.LoadingButton_buttonText).toString()
+            backColor = getColor(R.styleable.LoadingButton_backColor, 0)
+            circleColor = getColor(R.styleable.LoadingButton_circleColor, 0)
+        }
         ViewCompat.setAccessibilityDelegate(this, object : AccessibilityDelegateCompat() {
             override fun onInitializeAccessibilityNodeInfo(host: View, info: AccessibilityNodeInfoCompat) {
                 super.onInitializeAccessibilityNodeInfo(host, info)
@@ -99,15 +106,15 @@ class LoadingButton @JvmOverloads constructor(
         paint.color = Color.BLACK
         canvas.drawRect(0.0f,0.0f,animatedRecWidth.toFloat(),heightSize.toFloat(), paint)
 
-        paint.color = context.getColor(R.color.colorPrimary)
+        paint.color = backColor
         canvas.drawRect(animatedRecWidth.toFloat(),0.0f,(widthSize).toFloat(),heightSize.toFloat(), paint)
 
         paint.color = Color.WHITE
-        var text = resources.getString(R.string.download)
+        buttonText =resources.getString( R.string.download)
         if (buttonState == ButtonState.Loading) {
-            text = resources.getString(R.string.button_loading)
+            buttonText = resources.getString(R.string.button_loading)
         }
-        canvas.drawText(text , (widthSize / 2).toFloat(), (heightSize/2).toFloat(), paint)
+        canvas.drawText(buttonText , (widthSize / 2).toFloat(), (heightSize/2).toFloat(), paint)
 
         if (buttonState == ButtonState.Loading) {
             paint.color = circleColor
@@ -135,6 +142,7 @@ class LoadingButton @JvmOverloads constructor(
         widthAnim = valueAnimator.apply {
             setIntValues(0, widthSize)
             setDuration(4000)
+            repeatCount = ValueAnimator.INFINITE
 
         }
         widthAnim.addUpdateListener {
@@ -148,6 +156,7 @@ class LoadingButton @JvmOverloads constructor(
         sweepAnim = sweepAngleAnimator.apply {
             setFloatValues(0F,360F)
             setDuration(4000)
+            repeatCount = ValueAnimator.INFINITE
         }
 
         sweepAnim.addUpdateListener {
